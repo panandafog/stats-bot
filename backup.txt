@@ -1,0 +1,3 @@
+docker exec <container> sh -c 'mongodump --authenticationDatabase bot_db -u bot -p password --db bot_db --archive' > db.dump
+
+docker exec -i <container> sh -c 'mongorestore --authenticationDatabase bot_db -u bot -p password --db bot_db --archive' < db.dump
