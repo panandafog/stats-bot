@@ -1,0 +1,70 @@
+from multiprocessing import Process
+import time
+import logging
+import threading
+import discord
+from discord.ext import commands, tasks
+
+import configuration
+import database
+import sessions
+import stats.functions as stats_functions
+
+intents = discord.Intents.all()
+bot = commands.Bot(intents=intents)
+
+def current_guild():
+    logging.debug("Guild id: " + str(configuration.GUILD_ID))
+    logging.debug("Guilds: " + str(bot.guilds))
+    return discord.utils.find(lambda g: g.id == configuration.GUILD_ID, bot.guilds)
+
+def members_str(guild):
+    return '\n - '.join([member.name for member in guild.members])
+
+def channels_str(guild):
+    text = ''
+    for channel in guild.voice_channels:
+        text += '\n - '
+        text += channel.name
+        if len(channel.members) > 0:
+            text += '\n   members:'
+            for member in channel.members:
+                text += '\n    + '
+                text += member.name + ' ' + str(member.id)
+    return text
+
+def start_updating_sessions():
+    sessions.start_updating_sessions(current_guild)
+
+
+def run():
+    # @bot.slash_command(name="z_debug-print-guild-members", guild_ids=[configuration.GUILD_ID])
+    # async def debug_print(ctx):
+    #     guild = current_guild()
+    #     text = f'{bot.user} is connected to the following guild: ' \
+    #            + f'{guild.name}(id: {guild.id})\n' \
+    #            + f'Guild Members:\n - {members_str(guild)}\n'
+    #     await ctx.respond(text)
+    #
+    # @bot.slash_command(name="z_debug-print-voice-channels", guild_ids=[configuration.GUILD_ID])
+    # async def debug_print(ctx):
+    #     guild = current_guild()
+    #     text = f'Guild Channels:\n - {channels_str(guild)}\n'
+    #     await ctx.respond(text)
+
+    @bot.slash_command(name="top-users", guild_ids=[configuration.GUILD_ID])
+    async def top_users(ctx):
+        text = stats_functions.get_top_users_text()
+        await ctx.respond(text)
+
+    bot.run(configuration.TOKEN)
+
+if __name__ == '__main__':
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(relativeCreated)6d %(threadName)s %(message)s"
+    )
+    database.init()
+    thread = threading.Thread(target=start_updating_sessions, args=())
+    thread.start()
+    run()
