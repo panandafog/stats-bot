@@ -76,5 +76,6 @@ if __name__ == '__main__':
     )
     database.init()
     thread = threading.Thread(target=start_updating_sessions, args=())
+    thread.daemon = True
     thread.start()
     run()
