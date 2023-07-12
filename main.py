@@ -52,9 +52,19 @@ def run():
     #     text = f'Guild Channels:\n - {channels_str(guild)}\n'
     #     await ctx.respond(text)
 
-    @bot.slash_command(name="top-users", guild_ids=[configuration.GUILD_ID])
-    async def top_users(ctx):
-        text = stats_functions.get_top_users_text()
+    @bot.slash_command(name="top-users-day", guild_ids=[configuration.GUILD_ID])
+    async def top_users_1(ctx):
+        text = stats_functions.get_top_users_days_text(1)
+        await ctx.respond(text)
+
+    @bot.slash_command(name="top-users-7-days", guild_ids=[configuration.GUILD_ID])
+    async def top_users_7(ctx):
+        text = stats_functions.get_top_users_days_text(7)
+        await ctx.respond(text)
+
+    @bot.slash_command(name="top-users-30-days", guild_ids=[configuration.GUILD_ID])
+    async def top_users_30(ctx):
+        text = stats_functions.get_top_users_days_text(30)
         await ctx.respond(text)
 
     bot.run(configuration.TOKEN)
