@@ -48,7 +48,8 @@ def _get_top_users(start_datetime: datetime):
                 top_users.first_entry = start_time
 
         user_info = UserInfo.from_user(user, sessions, active_sessions.first(), start_datetime)
-        users_info.append(user_info)
+        if user_info.total_time > datetime.timedelta():
+            users_info.append(user_info)
 
     users_info.sort(key=lambda x: x.total_time, reverse=True)
     top_users.users_info = users_info

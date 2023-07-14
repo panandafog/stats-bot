@@ -3,6 +3,19 @@ import datetime
 from models import User, Session, ActiveSession, Channel
 
 
+def _calculate_channel_time(channels_time, session, delta):
+    channel_time = channels_time.get(session.channel.discord_id)
+    if channel_time is None:
+        channels_time[session.channel.discord_id] = {
+            'channel': session.channel,
+            'time': delta
+        }
+    else:
+        spent_time = channel_time['time']
+        if spent_time is None: spent_time = 0
+
+        channel_time['time'] = spent_time + delta
+
 class UserInfo:
     user = None
     total_time = None
@@ -26,17 +39,7 @@ class UserInfo:
                     delta = session.end_time - start_datetime
             user_info.total_time += delta
 
-            channel_time = channels_time.get(session.channel.discord_id)
-            if channel_time is None:
-                channels_time[session.channel.discord_id] = {
-                    'channel': session.channel,
-                    'time': delta
-                }
-            else:
-                spent_time = channel_time['time']
-                if spent_time is None: spent_time = 0
-
-                channel_time['time'] = spent_time + delta
+            _calculate_channel_time(channels_time, session, delta)
 
         if active_session is not None:
             user_info.is_active = True
@@ -49,18 +52,7 @@ class UserInfo:
                     delta = datetime.datetime.utcnow() - start_datetime
             user_info.total_time += delta
 
-            #fix copy-paste
-            channel_time = channels_time[active_session.channel.discord_id]
-            if channel_time is None:
-                channels_time[active_session.channel.discord_id] = {
-                    'channel': active_session.channel,
-                    'time': delta
-                }
-            else:
-                spent_time = channel_time['time']
-                if spent_time is None: spent_time = 0
-
-                channel_time['time'] = spent_time + delta
+            _calculate_channel_time(channels_time, active_session, delta)
 
         channels_time_list = list(channels_time.values())
         channels_time_list.sort(key=lambda x: x['time'], reverse=True)
