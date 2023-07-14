@@ -13,7 +13,8 @@ def make_top_users_message(top_users: TopUsers):
         text += f'(first entry {first_entry_str})\n'
 
     for user_info in top_users.users_info:
-        status = '💡' if user_info.is_active else ''
-        text += f'- {user_info.user.name}{status}: {date_format.strfdelta(user_info.total_time)}\n'
+        status = ' :headphones:' if user_info.is_active else ''
+        text += f'- **{user_info.user.name}**{status}: {date_format.strfdelta(user_info.total_time)} '
+        text += f'*/ favourite channel:* <#{user_info.top_channel.discord_id}>\n'
 
     return text

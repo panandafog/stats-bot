@@ -33,8 +33,13 @@ def _get_top_users(start_datetime: datetime):
 
         for session in all_sessions:
             start_time = None
+            end_time = None
+            try:
+                end_time = session.end_time
+            except:
+                pass
             if session.start_time < start_datetime:
-                if (session.end_time is not None) and (session.end_time > start_datetime):
+                if (end_time is not None) and (end_time > start_datetime):
                     start_time = start_datetime
             else:
                 start_time = session.start_time

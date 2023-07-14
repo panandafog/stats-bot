@@ -1,11 +1,12 @@
 import datetime
 
-from models import User, Session, ActiveSession
+from models import User, Session, ActiveSession, Channel
 
 
 class UserInfo:
     user = None
     total_time = None
+    top_channel = None
     is_active = False
 
     @staticmethod
@@ -14,23 +15,56 @@ class UserInfo:
         user_info.user = user
         user_info.total_time = datetime.timedelta()
 
+        channels_time = {}
+
         for session in sessions:
             delta = datetime.timedelta()
-
             if session.end_time > start_datetime:
                 if session.start_time > start_datetime:
                     delta = session.end_time - session.start_time
                 else:
                     delta = session.end_time - start_datetime
-
             user_info.total_time += delta
+
+            channel_time = channels_time.get(session.channel.discord_id)
+            if channel_time is None:
+                channels_time[session.channel.discord_id] = {
+                    'channel': session.channel,
+                    'time': delta
+                }
+            else:
+                spent_time = channel_time['time']
+                if spent_time is None: spent_time = 0
+
+                channel_time['time'] = spent_time + delta
 
         if active_session is not None:
             user_info.is_active = True
 
-            delta = datetime.datetime.utcnow() - active_session.start_time
+            delta = datetime.timedelta()
+            if datetime.datetime.utcnow() > start_datetime:
+                if active_session.start_time > start_datetime:
+                    delta = datetime.datetime.utcnow() - active_session.start_time
+                else:
+                    delta = datetime.datetime.utcnow() - start_datetime
             user_info.total_time += delta
 
+            #fix copy-paste
+            channel_time = channels_time[active_session.channel.discord_id]
+            if channel_time is None:
+                channels_time[active_session.channel.discord_id] = {
+                    'channel': active_session.channel,
+                    'time': delta
+                }
+            else:
+                spent_time = channel_time['time']
+                if spent_time is None: spent_time = 0
+
+                channel_time['time'] = spent_time + delta
+
+        channels_time_list = list(channels_time.values())
+        channels_time_list.sort(key=lambda x: x['time'], reverse=True)
+        user_info.top_channel = channels_time_list[0]['channel']
         return user_info
 
 
