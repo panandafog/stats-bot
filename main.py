@@ -9,6 +9,7 @@ import configuration
 import database
 import sessions
 import stats.functions as stats_functions
+import stats.text_channels as text_channels_functions
 
 intents = discord.Intents.all()
 bot = commands.Bot(intents=intents)
@@ -65,6 +66,24 @@ def run():
     @bot.slash_command(name="top-users-30-days", guild_ids=[configuration.GUILD_ID])
     async def top_users_30(ctx):
         text = stats_functions.get_top_users_days_text(30)
+        await ctx.respond(text)
+
+    @bot.slash_command(name="top-channels-day", guild_ids=[configuration.GUILD_ID])
+    async def top_channels_1(ctx):
+        await ctx.response.defer()
+        text = await text_channels_functions.get_top_channels_text(current_guild, 1)
+        await ctx.respond(text)
+
+    @bot.slash_command(name="top-channels-7-days", guild_ids=[configuration.GUILD_ID])
+    async def top_channels_7(ctx):
+        await ctx.response.defer()
+        text = await text_channels_functions.get_top_channels_text(current_guild, 7)
+        await ctx.respond(text)
+
+    @bot.slash_command(name="top-channels-30-days", guild_ids=[configuration.GUILD_ID])
+    async def top_channels_7(ctx):
+        await ctx.response.defer()
+        text = await text_channels_functions.get_top_channels_text(current_guild, 30)
         await ctx.respond(text)
 
     bot.run(configuration.TOKEN)

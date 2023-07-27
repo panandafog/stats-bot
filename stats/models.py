@@ -1,4 +1,5 @@
 import datetime
+import discord.channel
 
 from models import User, Session, ActiveSession, Channel
 
@@ -64,3 +65,21 @@ class TopUsers:
     users_info = []
     start_datetime = None
     first_entry = None
+
+
+class ChannelMessagesCountInfo:
+    channel = None
+    messages_count = 0
+
+    def __init__(self, channel, messages_count):
+        self.channel = channel
+        self.messages_count = messages_count
+
+
+class TopChannels:
+    channels_info = []
+    start_datetime = None
+
+    def __init__(self, channels_info, start_datetime):
+        self.channels_info = channels_info
+        self.start_datetime = start_datetime

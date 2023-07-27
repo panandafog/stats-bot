@@ -1,6 +1,6 @@
 import utils.date_format as date_format
 
-from stats.models import TopUsers
+from stats.models import TopUsers, TopChannels
 
 
 def make_top_users_message(top_users: TopUsers):
@@ -16,5 +16,18 @@ def make_top_users_message(top_users: TopUsers):
         status = ' :headphones:' if user_info.is_active else ''
         text += f'- **{user_info.user.name}**{status}: {date_format.strfdelta(user_info.total_time)} '
         text += f'*/ favourite channel:* <#{user_info.top_channel.discord_id}>\n'
+
+    return text
+
+
+def make_top_channels_message(top_channels: TopChannels):
+    start_str = top_channels.start_datetime.strftime("%d/%m/%Y, %H:%M")
+    text = f'Messages count since {start_str}\n'
+
+    for channel_info in top_channels.channels_info:
+        text += f'- <#{channel_info.channel.id}>: {channel_info.messages_count}\n'
+
+    if len(top_channels.channels_info) < 1:
+        text += '  messages not found 😢'
 
     return text
