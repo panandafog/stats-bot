@@ -10,6 +10,7 @@ import database
 import sessions
 import stats.functions as stats_functions
 import stats.text_channels as text_channels_functions
+import rofls.cats as cats
 
 intents = discord.Intents.all()
 bot = commands.Bot(intents=intents)
@@ -39,19 +40,8 @@ def start_updating_sessions():
 
 
 def run():
-    # @bot.slash_command(name="z_debug-print-guild-members", guild_ids=[configuration.GUILD_ID])
-    # async def debug_print(ctx):
-    #     guild = current_guild()
-    #     text = f'{bot.user} is connected to the following guild: ' \
-    #            + f'{guild.name}(id: {guild.id})\n' \
-    #            + f'Guild Members:\n - {members_str(guild)}\n'
-    #     await ctx.respond(text)
-    #
-    # @bot.slash_command(name="z_debug-print-voice-channels", guild_ids=[configuration.GUILD_ID])
-    # async def debug_print(ctx):
-    #     guild = current_guild()
-    #     text = f'Guild Channels:\n - {channels_str(guild)}\n'
-    #     await ctx.respond(text)
+
+    # users
 
     @bot.slash_command(name="top-users-day", guild_ids=[configuration.GUILD_ID])
     async def top_users_1(ctx):
@@ -67,6 +57,8 @@ def run():
     async def top_users_30(ctx):
         text = stats_functions.get_top_users_days_text(30)
         await ctx.respond(text)
+
+    #channels
 
     @bot.slash_command(name="top-text-channels-day", guild_ids=[configuration.GUILD_ID])
     async def top_text_channels_1(ctx):
@@ -85,6 +77,14 @@ def run():
         await ctx.response.defer()
         text = await text_channels_functions.get_top_channels_text(current_guild, 30)
         await ctx.respond(text)
+
+    # rofls
+
+    @bot.slash_command(name="cat", guild_ids=[configuration.GUILD_ID])
+    async def random_cat(ctx):
+        await ctx.response.defer()
+        image = cats.random_cat()
+        await ctx.respond(file=image)
 
     bot.run(configuration.TOKEN)
 
